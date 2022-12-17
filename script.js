@@ -73,3 +73,9 @@ function displayMovements(account) {
 }
 
 displayMovements(account1);
+
+function createUsernames(accs) {
+    accs.forEach(acc => {
+        acc.username = acc.owner.toLowerCase().split(' ').map(name => name[0]).join('');
+    });
+} createUsernames(accounts);
