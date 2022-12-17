@@ -55,8 +55,9 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-function displayMovements() {
-    this.movements.forEach(function (mov, i) {
+function displayMovements(account) {
+    containerMovements.innerHTML = '';
+    account.movements.forEach(function (mov, i) {
         const type = mov > 0 ? 'deposit' : 'withdrawal';
 
         const html = `
@@ -66,9 +67,9 @@ function displayMovements() {
                 <div class="movements__value">€${mov.toLocaleString('en-US')}</div>
             </div>
         `
-        
+
         containerMovements.insertAdjacentHTML('afterbegin', html);
     });
 }
 
-displayMovements.call(account1);
+displayMovements(account1);
