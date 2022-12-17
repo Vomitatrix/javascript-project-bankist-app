@@ -54,3 +54,27 @@ const inputTransferAmount = document.querySelector('.form__input--amount');
 const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
+
+function displayMovements() {
+    this.movements.forEach(function (mov, i) {
+        const type = mov > 0 ? 'deposit' : 'withdrawal';
+        const newMovementDiv = document.createElement('div');
+        const newMovementType = document.createElement('div');
+        const newMovementDate = document.createElement('div');
+        const newMovementValue = document.createElement('div');
+        newMovementDiv.classList.add('movements__row');
+        newMovementType.classList.add('movements__type', `movements__type--${type}`);
+        newMovementDate.classList.add('movements__date');
+        newMovementValue.classList.add('movements__value');
+        newMovementType.textContent = `${i + 1} ${type}`;
+        newMovementDate.textContent = '7 days ago';
+        newMovementValue.textContent = `€${mov}`.toLocaleString('en-US');
+        newMovementDiv.appendChild(newMovementType);
+        newMovementDiv.appendChild(newMovementDate);
+        newMovementDiv.appendChild(newMovementValue);
+
+        containerMovements.prepend(newMovementDiv);
+    });
+}
+
+displayMovements.call(account1);
