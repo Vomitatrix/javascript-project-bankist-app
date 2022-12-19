@@ -81,3 +81,23 @@ function createUsernames(accs) {
         acc.username = acc.owner.toLowerCase().split(' ').map(name => name[0]).join('');
     });
 } createUsernames(accounts);
+
+function calcDisplaySummary(acc) {
+    labelSumIn.textContent = '€' + acc.movements
+        .filter(mov => mov > 0)
+        .reduce((acc, mov) => acc + mov, 0)
+        .toFixed(2)
+        .toLocaleString('en-US');
+    labelSumOut.textContent = '€' + acc.movements
+        .filter(mov => mov < 0)
+        .reduce((acc, mov) => acc + Math.abs(mov), 0)
+        .toFixed(2)
+        .toLocaleString('en-US');
+    labelSumInterest.textContent = '€' + acc.movements
+        .filter(mov => mov > 0)
+        .map(mov => mov * acc.interestRate / 100)
+        .filter(int => int >= 1)
+        .reduce((acc, int) => acc + int, 0)
+        .toFixed(2)
+        .toLocaleString('en-US');
+} calcDisplaySummary(account1);
