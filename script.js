@@ -32,7 +32,7 @@ const accounts = [account1, account2, account3, account4];
 
 const labelWelcome = document.querySelector('.welcome');
 const labelDate = document.querySelector('.date');
-const labelBalance = document.querySelector('.balance_value');
+const labelBalance = document.querySelector('.balance__value');
 const labelSumIn = document.querySelector('.summary__value--in');
 const labelSumOut = document.querySelector('.summary__value--out');
 const labelSumInterest = document.querySelector('.summary__value--interest');
@@ -70,9 +70,11 @@ function displayMovements(account) {
 
         containerMovements.insertAdjacentHTML('afterbegin', html);
     });
-}
+} displayMovements(account1);
 
-displayMovements(account1);
+function calcDisplayBalance(acc) {
+    return `€${acc.movements.reduce((accu, curr) => accu + curr, 0).toLocaleString('en-US')}`;
+} labelBalance.textContent = calcDisplayBalance(account1);
 
 function createUsernames(accs) {
     accs.forEach(acc => {
