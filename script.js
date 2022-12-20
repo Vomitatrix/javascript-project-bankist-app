@@ -70,11 +70,31 @@ function displayMovements(account) {
 
         containerMovements.insertAdjacentHTML('afterbegin', html);
     });
-} displayMovements(account1);
+}
 
 function calcDisplayBalance(acc) {
-    return `€${acc.movements.reduce((accu, curr) => accu + curr, 0).toLocaleString('en-US')}`;
-} labelBalance.textContent = calcDisplayBalance(account1);
+    labelBalance.textContent = `€${acc.movements.reduce((accu, curr) => accu + curr, 0).toLocaleString('en-US')}`;
+}
+
+function calcDisplaySummary(acc) {
+    labelSumIn.textContent = '€' + acc.movements
+        .filter(mov => mov > 0)
+        .reduce((acc, mov) => acc + mov, 0)
+        // .toFixed(2)
+        .toLocaleString('en-US');
+    labelSumOut.textContent = '€' + acc.movements
+        .filter(mov => mov < 0)
+        .reduce((acc, mov) => acc + Math.abs(mov), 0)
+        // .toFixed(2)
+        .toLocaleString('en-US');
+    labelSumInterest.textContent = '€' + acc.movements
+        .filter(mov => mov > 0)
+        .map(mov => mov * acc.interestRate / 100)
+        .filter(int => int >= 1)
+        .reduce((acc, int) => acc + int, 0)
+        // .toFixed(2)
+        .toLocaleString('en-US');
+}
 
 function createUsernames(accs) {
     accs.forEach(acc => {
@@ -82,22 +102,31 @@ function createUsernames(accs) {
     });
 } createUsernames(accounts);
 
-function calcDisplaySummary(acc) {
-    labelSumIn.textContent = '€' + acc.movements
-        .filter(mov => mov > 0)
-        .reduce((acc, mov) => acc + mov, 0)
-        .toFixed(2)
-        .toLocaleString('en-US');
-    labelSumOut.textContent = '€' + acc.movements
-        .filter(mov => mov < 0)
-        .reduce((acc, mov) => acc + Math.abs(mov), 0)
-        .toFixed(2)
-        .toLocaleString('en-US');
-    labelSumInterest.textContent = '€' + acc.movements
-        .filter(mov => mov > 0)
-        .map(mov => mov * acc.interestRate / 100)
-        .filter(int => int >= 1)
-        .reduce((acc, int) => acc + int, 0)
-        .toFixed(2)
-        .toLocaleString('en-US');
-} calcDisplaySummary(account1);
+let currentAccount = {};
+function login(username, password) {
+    // check if there is an account with the username and password in the input field
+    if (accounts.find(account => account.username === username && account.pin === password)) {
+        // save current account obect in variable
+        currentAccount = accounts.find(account => account.username === username);
+        // display UI and welcome message
+        containerApp.style.opacity = '100';
+        labelWelcome.textContent = `Welcome back, ${currentAccount.owner.split(' ')[0]}!`;
+
+        // run the functions to display the movements
+        displayMovements(currentAccount);
+        // display current balance
+        calcDisplayBalance(currentAccount);
+        // dispaly the summary of movements
+        calcDisplaySummary(currentAccount);
+        // empty the login form fiels and lose focus
+        inputLoginUsername.value = '';
+        inputLoginPin.value = '';
+        inputLoginUsername.blur();
+        inputLoginPin.blur();
+    }
+}
+
+btnLogin.addEventListener('click', (e) => {
+    e.preventDefault();
+    login(inputLoginUsername.value, Number(inputLoginPin.value))
+});
