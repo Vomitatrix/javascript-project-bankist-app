@@ -49,7 +49,7 @@ const btnSort = document.querySelector('.btn--sort');
 
 const inputLoginUsername = document.querySelector('.login__input--user');
 const inputLoginPin = document.querySelector('.login__input--pin');
-const inputTransferTo = document.querySelector('.form__input--to');
+const inputrecipient = document.querySelector('.form__input--to');
 const inputTransferAmount = document.querySelector('.form__input--amount');
 const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
@@ -73,7 +73,8 @@ function displayMovements(account) {
 }
 
 function calcDisplayBalance(acc) {
-    labelBalance.textContent = `€${acc.movements.reduce((accu, curr) => accu + curr, 0).toLocaleString('en-US')}`;
+    acc.balance = acc.movements.reduce((accu, curr) => accu + curr, 0);
+    labelBalance.textContent = `€${acc.balance.toLocaleString('en-US')}`;
 }
 
 function calcDisplaySummary(acc) {
@@ -112,21 +113,54 @@ function login(username, password) {
         containerApp.style.opacity = '100';
         labelWelcome.textContent = `Welcome back, ${currentAccount.owner.split(' ')[0]}!`;
 
-        // run the functions to display the movements
-        displayMovements(currentAccount);
-        // display current balance
-        calcDisplayBalance(currentAccount);
-        // dispaly the summary of movements
-        calcDisplaySummary(currentAccount);
+        updateUI(currentAccount);
         // empty the login form fiels and lose focus
-        inputLoginUsername.value = '';
-        inputLoginPin.value = '';
+        inputLoginUsername.value = inputLoginPin.value = '';
         inputLoginUsername.blur();
         inputLoginPin.blur();
     }
 }
 
+function transfer(to, amount = 0) {
+    // select object of the recipient and convert the amount from a string to a number
+    const recipient = accounts.find(account => account.username === to);
+    amount = Number(amount);
+
+    // check if the amount is more than 0 but less than the account balance
+    // also check if the recipient exists and if it's different from the sender
+    if (amount > 0 && amount <= currentAccount.balance && recipient && recipient?.username !== currentAccount.username) {
+        currentAccount.movements.push(-amount);
+        recipient.movements.push(amount);
+
+        alert(`Transfer of €${amount} to ${recipient.owner.split(' ')[0]} successful.`);
+
+        updateUI(currentAccount);
+        // empty the login form fiels and lose focus
+        inputrecipient.value = inputTransferAmount.value = '';
+        inputrecipient.blur();
+        inputTransferAmount.blur();
+    } else {
+        if (recipient === currentAccount) alert('You cannot transfer money to yourself.');
+        if (amount > currentAccount.balance) alert('Insufficient funds.');
+        if (amount <= 0) alert('The transfer amount must be more than 0.');
+        else alert('Unknown error.');
+    }
+}
+
+function updateUI(data) {
+    // run the functions to display the movements
+    displayMovements(data);
+    // display current balance
+    calcDisplayBalance(data);
+    // dispaly the summary of movements
+    calcDisplaySummary(data);
+}
+
 btnLogin.addEventListener('click', (e) => {
     e.preventDefault();
     login(inputLoginUsername.value, Number(inputLoginPin.value))
+});
+btnTransfer.addEventListener('click', (e) => {
+    e.preventDefault();
+    transfer(inputrecipient.value, inputTransferAmount.value);
 });
