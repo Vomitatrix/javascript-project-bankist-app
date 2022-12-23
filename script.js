@@ -49,7 +49,7 @@ const btnSort = document.querySelector('.btn--sort');
 
 const inputLoginUsername = document.querySelector('.login__input--user');
 const inputLoginPin = document.querySelector('.login__input--pin');
-const inputrecipient = document.querySelector('.form__input--to');
+const inputTransferTo = document.querySelector('.form__input--to');
 const inputTransferAmount = document.querySelector('.form__input--amount');
 const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
@@ -136,14 +136,27 @@ function transfer(to, amount = 0) {
 
         updateUI(currentAccount);
         // empty the login form fiels and lose focus
-        inputrecipient.value = inputTransferAmount.value = '';
-        inputrecipient.blur();
+        inputTransferTo.value = inputTransferAmount.value = '';
+        inputTransferTo.blur();
         inputTransferAmount.blur();
     } else {
         if (recipient === currentAccount) alert('You cannot transfer money to yourself.');
         if (amount > currentAccount.balance) alert('Insufficient funds.');
         if (amount <= 0) alert('The transfer amount must be more than 0.');
         else alert('Unknown error.');
+    }
+}
+
+function closeAccount(user, pin) {
+    // check if current account's username and pin are the same as the ones in the form and also check if it's in the accounts array
+    if (currentAccount.username === user && currentAccount.pin === Number(pin) && accounts.find(account => account === currentAccount)) {
+        // find the index of the current account in the accounts array to use it as the first parameter in the splice
+        const index = accounts.findIndex(account => account.username === user);
+        accounts.splice(index, 1);
+        
+        // hide the UI and clear the form fields
+        containerApp.style.opacity = '0';
+        inputTransferTo.value = inputTransferAmount.value = '';
     }
 }
 
@@ -162,5 +175,9 @@ btnLogin.addEventListener('click', (e) => {
 });
 btnTransfer.addEventListener('click', (e) => {
     e.preventDefault();
-    transfer(inputrecipient.value, inputTransferAmount.value);
+    transfer(inputTransferTo.value, inputTransferAmount.value);
 });
+btnClose.addEventListener('click', (e) => {
+    e.preventDefault();
+    closeAccount(inputCloseUsername.value, inputClosePin.value);
+})
