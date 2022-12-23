@@ -55,9 +55,9 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-function displayMovements(account) {
+function displayMovements(movs) {
     containerMovements.innerHTML = '';
-    account.movements.forEach(function (mov, i) {
+    movs.forEach(function (mov, i) {
         const type = mov > 0 ? 'deposit' : 'withdrawal';
 
         const html = `
@@ -95,6 +95,24 @@ function calcDisplaySummary(acc) {
         .reduce((acc, int) => acc + int, 0)
         // .toFixed(2)
         .toLocaleString('en-US');
+}
+
+let sorted = 'default';
+function sort() {
+    const ascending = currentAccount.movements.slice().sort((a, b) => a - b);
+    if (sorted === 'default') {
+        displayMovements(ascending);
+        btnSort.innerHTML = '&uparrow; SORT (Ascending)';
+        sorted = 'ascending';
+    } else if (sorted === 'ascending') {
+        displayMovements(ascending.reverse());
+        btnSort.innerHTML = '&downarrow; SORT (Descending)';
+        sorted = 'descending';
+    } else {
+        displayMovements(currentAccount.movements);
+        btnSort.innerHTML = '&downarrow; SORT';
+        sorted = 'default';
+    }
 }
 
 function createUsernames(accs) {
@@ -169,13 +187,13 @@ function closeAccount(user, pin) {
     }
 }
 
-function updateUI(data) {
+function updateUI(account) {
     // run the functions to display the movements
-    displayMovements(data);
+    displayMovements(account.movements);
     // display current balance
-    calcDisplayBalance(data);
+    calcDisplayBalance(account);
     // dispaly the summary of movements
-    calcDisplaySummary(data);
+    calcDisplaySummary(account);
 }
 
 btnLogin.addEventListener('click', (e) => {
@@ -189,8 +207,9 @@ btnTransfer.addEventListener('click', (e) => {
 btnClose.addEventListener('click', (e) => {
     e.preventDefault();
     closeAccount(inputCloseUsername.value, inputClosePin.value);
-})
+});
 btnLoan.addEventListener('click', (e) => {
     e.preventDefault();
     loan(inputLoanAmount.value);
-})
+});
+btnSort.addEventListener('click', sort);
