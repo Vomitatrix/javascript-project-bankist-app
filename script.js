@@ -147,13 +147,22 @@ function transfer(to, amount = 0) {
     }
 }
 
+function loan(amount) {
+    amount = Number(amount)
+    if (amount > 0 && currentAccount.movements.some(mov => mov >= amount / 10)) {
+        currentAccount.movements.push(amount);
+        inputLoanAmount.value = '';
+        updateUI(currentAccount);
+    }
+}
+
 function closeAccount(user, pin) {
     // check if current account's username and pin are the same as the ones in the form and also check if it's in the accounts array
     if (currentAccount.username === user && currentAccount.pin === Number(pin) && accounts.find(account => account === currentAccount)) {
         // find the index of the current account in the accounts array to use it as the first parameter in the splice
         const index = accounts.findIndex(account => account.username === user);
         accounts.splice(index, 1);
-        
+
         // hide the UI and clear the form fields
         containerApp.style.opacity = '0';
         inputTransferTo.value = inputTransferAmount.value = '';
@@ -180,4 +189,8 @@ btnTransfer.addEventListener('click', (e) => {
 btnClose.addEventListener('click', (e) => {
     e.preventDefault();
     closeAccount(inputCloseUsername.value, inputClosePin.value);
+})
+btnLoan.addEventListener('click', (e) => {
+    e.preventDefault();
+    loan(inputLoanAmount.value);
 })
