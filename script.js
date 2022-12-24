@@ -64,7 +64,7 @@ function displayMovements(movs) {
             <div class="movements__row">
                 <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
                 <div class="movements__date">7 days ago</div>
-                <div class="movements__value">€${mov.toLocaleString('en-US')}</div>
+                <div class="movements__value">${mov.toLocaleString('en-US', {style: 'currency', currency: 'EUR'})}</div>
             </div>
         `
 
@@ -74,27 +74,27 @@ function displayMovements(movs) {
 
 function calcDisplayBalance(acc) {
     acc.balance = acc.movements.reduce((accu, curr) => accu + curr, 0);
-    labelBalance.textContent = `€${acc.balance.toLocaleString('en-US')}`;
+    labelBalance.textContent = `${acc.balance.toLocaleString('en-US', {style: 'currency', currency: 'EUR'})}`;
 }
 
 function calcDisplaySummary(acc) {
-    labelSumIn.textContent = '€' + acc.movements
+    labelSumIn.textContent = acc.movements
         .filter(mov => mov > 0)
         .reduce((acc, mov) => acc + mov, 0)
         // .toFixed(2)
-        .toLocaleString('en-US');
-    labelSumOut.textContent = '€' + acc.movements
+        .toLocaleString('en-US', {style: 'currency', currency: 'EUR'});
+    labelSumOut.textContent = acc.movements
         .filter(mov => mov < 0)
         .reduce((acc, mov) => acc + Math.abs(mov), 0)
         // .toFixed(2)
-        .toLocaleString('en-US');
-    labelSumInterest.textContent = '€' + acc.movements
+        .toLocaleString('en-US', {style: 'currency', currency: 'EUR'});
+    labelSumInterest.textContent = acc.movements
         .filter(mov => mov > 0)
         .map(mov => mov * acc.interestRate / 100)
         .filter(int => int >= 1)
         .reduce((acc, int) => acc + int, 0)
         // .toFixed(2)
-        .toLocaleString('en-US');
+        .toLocaleString('en-US', {style: 'currency', currency: 'EUR'});
 }
 
 let sorted = 'default';
@@ -166,7 +166,6 @@ function transfer(to, amount = 0) {
 }
 
 function loan(amount) {
-    amount = Number(amount)
     if (amount > 0 && currentAccount.movements.some(mov => mov >= amount / 10)) {
         currentAccount.movements.push(amount);
         inputLoanAmount.value = '';
@@ -210,6 +209,6 @@ btnClose.addEventListener('click', (e) => {
 });
 btnLoan.addEventListener('click', (e) => {
     e.preventDefault();
-    loan(inputLoanAmount.value);
+    loan(Math.floor(inputLoanAmount.value));
 });
 btnSort.addEventListener('click', sort);
