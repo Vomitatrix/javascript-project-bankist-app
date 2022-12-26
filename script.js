@@ -70,6 +70,11 @@ function displayMovements(movs) {
 
         containerMovements.insertAdjacentHTML('afterbegin', html);
     });
+    
+    // Makes every other row of movements a light grey colour for easier row distinction
+    [...document.querySelectorAll('.movements__row')].forEach((row, i) => {
+        if ((i + 1) % 2 === 0) row.style.backgroundColor = '#efefef';
+    });
 }
 
 function calcDisplayBalance(acc) {
@@ -107,7 +112,7 @@ function sort() {
         sorted = 'descending';
     } else {
         displayMovements(currentAccount.movements);
-        btnSort.innerHTML = '&downarrow; SORT';
+        btnSort.innerHTML = '&downarrow; SORT (Default)';
         sorted = 'default';
     }
 }
