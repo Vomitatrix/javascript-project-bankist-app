@@ -14,7 +14,9 @@ const account1 = {
         '2020-07-12T10:51:36.790Z'
     ],
     interestRate: 1.2,
-    pin: 1111
+    pin: 1111,
+    locale: 'en-IE',
+    currency: 'EUR'
 }
 
 const account2 = {
@@ -31,7 +33,9 @@ const account2 = {
         '2022-06-10T23:36:17.929Z',
         '2022-09-04T10:51:36.790Z'
     ],
-    pin: 2222
+    pin: 2222,
+    locale: 'en-US',
+    currency: 'USD'
 }
 
 const account3 = {
@@ -48,7 +52,9 @@ const account3 = {
         '2022-01-26T23:36:17.929Z',
         '2022-12-19T10:51:36.790Z'
     ],
-    pin: 3333
+    pin: 3333,
+    locale: 'en-GB',
+    currency: 'GBP'
 }
 
 const account4 = {
@@ -62,7 +68,9 @@ const account4 = {
         '2022-08-16T17:01:17.194Z',
         '2022-09-26T23:36:17.929Z'
     ],
-    pin: 4444
+    pin: 4444,
+    locale: 'de-DE',
+    currency: 'EUR'
 }
 
 const accounts = [account1, account2, account3, account4];
@@ -96,8 +104,9 @@ function displayMovements(movs, dates) {
     containerMovements.innerHTML = '';
     movs.forEach(function (mov, i) {
         const type = mov > 0 ? 'deposit' : 'withdrawal';
-        const date = dates[i].split('T')[0];
-        const dateDifference = (+new Date(new Date(Date.now()).toISOString().split('T')[0]) - +(new Date(date))) / (1000 * 60 * 60 * 24); // to check the difference in days
+        const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
+        const date = Intl.DateTimeFormat(locale, options).format(new Date(dates[i]));
+        const dateDifference = Math.trunc((+new Date(new Date(Date.now())) - +(new Date(date))) / (1000 * 60 * 60 * 24)); // to check the difference in days
 
         const html = `
             <div class="movements__row">
@@ -107,7 +116,7 @@ function displayMovements(movs, dates) {
                     dateDifference === 1 ? 'YESYERDAY' :
                     dateDifference <= 7 ? `${dateDifference} DAYS AGO` : date
                 }</div>
-                <div class="movements__value">${mov.toLocaleString('en-US', {style: 'currency', currency: 'EUR'})}</div>
+                <div class="movements__value">${mov.toLocaleString(locale, {style: 'currency', currency: currentAccount.currency})}</div>
             </div>
         `
 
@@ -121,24 +130,24 @@ function displayMovements(movs, dates) {
 
 function calcDisplayBalance(acc) {
     acc.balance = acc.movements.reduce((accu, curr) => accu + curr, 0);
-    labelBalance.textContent = `${acc.balance.toLocaleString('en-US', {style: 'currency', currency: 'EUR'})}`;
+    labelBalance.textContent = `${acc.balance.toLocaleString(locale, {style: 'currency', currency: currentAccount.currency})}`;
 }
 
 function calcDisplaySummary(acc) {
     labelSumIn.textContent = acc.movements
         .filter(mov => mov > 0)
         .reduce((acc, mov) => acc + mov, 0)
-        .toLocaleString('en-US', {style: 'currency', currency: 'EUR'});
+        .toLocaleString(locale, {style: 'currency', currency: currentAccount.currency});
     labelSumOut.textContent = acc.movements
         .filter(mov => mov < 0)
         .reduce((acc, mov) => acc + Math.abs(mov), 0)
-        .toLocaleString('en-US', {style: 'currency', currency: 'EUR'});
+        .toLocaleString(locale, {style: 'currency', currency: currentAccount.currency});
     labelSumInterest.textContent = acc.movements
         .filter(mov => mov > 0)
         .map(mov => mov * acc.interestRate / 100)
         .filter(int => int >= 1)
         .reduce((acc, int) => acc + int, 0)
-        .toLocaleString('en-US', {style: 'currency', currency: 'EUR'});
+        .toLocaleString(locale, {style: 'currency', currency: currentAccount.currency});
 }
 
 let sorted = 'default';
@@ -178,11 +187,13 @@ function createUsernames(accs) {
 } createUsernames(accounts);
 
 let currentAccount = {};
+let locale;
 function login(username, password) {
     // check if there is an account with the username and password in the input field
     if (accounts.find(account => account.username === username && account.pin === password)) {
-        // save current account obect in variable
+        // save current account obect in variable and update locale if applicable
         currentAccount = accounts.find(account => account.username === username);
+        locale = locale || navigator.language;
         // display UI and welcome message
         containerApp.style.opacity = '100';
         labelWelcome.textContent = `Welcome back, ${currentAccount.owner.split(' ')[0]}!`;
@@ -247,8 +258,9 @@ function closeAccount(user, pin) {
 }
 
 function displayDate() {
-    const currentDate = new Date(Date.now()).toISOString();
-    labelDate.textContent = `${currentDate.slice(0, 10)}, ${currentDate.slice(11, 16)}`;
+    const currentDate = Date.now();
+    const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+    labelDate.textContent = Intl.DateTimeFormat(locale, options).format(currentDate);
 }
 
 function updateUI(account) {
