@@ -97,11 +97,16 @@ function displayMovements(movs, dates) {
     movs.forEach(function (mov, i) {
         const type = mov > 0 ? 'deposit' : 'withdrawal';
         const date = dates[i].split('T')[0];
+        const dateDifference = (+new Date(new Date(Date.now()).toISOString().split('T')[0]) - +(new Date(date))) / (1000 * 60 * 60 * 24); // to check the difference in days
 
         const html = `
             <div class="movements__row">
                 <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
-                <div class="movements__date">${date}</div>
+                <div class="movements__date">${
+                    dateDifference === 0 ? 'TODAY' :
+                    dateDifference === 1 ? 'YESYERDAY' :
+                    dateDifference <= 7 ? `${dateDifference} DAYS AGO` : date
+                }</div>
                 <div class="movements__value">${mov.toLocaleString('en-US', {style: 'currency', currency: 'EUR'})}</div>
             </div>
         `
