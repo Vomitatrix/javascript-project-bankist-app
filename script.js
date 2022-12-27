@@ -235,12 +235,16 @@ function transfer(to, amount = 0) {
 }
 
 function loan(amount) {
+    inputLoanAmount.value = '';
     if (amount > 0 && currentAccount.movements.some(mov => mov >= amount / 10)) {
-        currentAccount.movements.push(amount);
-        inputLoanAmount.value = '';
-        currentAccount.movementsDates.push(new Date(Date.now()).toISOString());
-
-        updateUI(currentAccount);
+        setTimeout(() => {
+            currentAccount.movements.push(amount);
+            currentAccount.movementsDates.push(new Date(Date.now()).toISOString());
+            alert(`Loan of ${amount.toLocaleString(locale, {style: 'currency', currency: currentAccount.currency})} approved!`);
+            updateUI(currentAccount);
+        }, 5000);
+    } else {
+        setTimeout(() => { alert(`Loan of ${amount.toLocaleString(locale, {style: 'currency', currency: currentAccount.currency})} denied.`); }, 5000);
     }
 }
 
