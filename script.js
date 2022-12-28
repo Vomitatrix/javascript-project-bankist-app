@@ -186,8 +186,7 @@ function createUsernames(accs) {
     });
 } createUsernames(accounts);
 
-let currentAccount = {};
-let locale;
+let currentAccount, locale, timer;
 function login(username, password) {
     // check if there is an account with the username and password in the input field
     if (accounts.find(account => account.username === username && account.pin === password)) {
@@ -197,7 +196,7 @@ function login(username, password) {
         // display UI and welcome message
         containerApp.style.opacity = '100';
         labelWelcome.textContent = `Welcome back, ${currentAccount.owner.split(' ')[0]}!`;
-
+        
         updateUI(currentAccount);
         // empty the login form fiels and lose focus
         inputLoginUsername.value = inputLoginPin.value = '';
@@ -267,6 +266,28 @@ function displayDate() {
     labelDate.textContent = Intl.DateTimeFormat(locale, options).format(currentDate);
 }
 
+function logoutTimer() {
+    function tick() {
+        if (timeLeft === 0) {
+            clearInterval(timer);
+            containerApp.style.opacity = '0';
+            labelWelcome.textContent = 'Log in to get started';
+            
+        }
+
+        const min = String(Math.trunc(timeLeft / 60)).padStart(2, 0);
+        const sec = String(timeLeft % 60).padStart(2, 0);
+        labelTimer.textContent = `${min}:${sec}`;
+        timeLeft--;
+    }
+
+    let timeLeft = 300;
+    tick();
+    const timer = setInterval(tick, 1000);
+
+    return timer;
+}
+
 function updateUI(account) {
     // display dates
     displayDate();
@@ -276,6 +297,9 @@ function updateUI(account) {
     calcDisplayBalance(account);
     // dispaly the summary of movements
     calcDisplaySummary(account);
+    // check if there is a timer and reset it if there is
+    if (timer) clearInterval(timer);
+    timer = logoutTimer();
 }
 
 btnLogin.addEventListener('click', (e) => {
